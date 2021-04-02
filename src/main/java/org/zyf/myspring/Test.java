@@ -6,7 +6,7 @@ package org.zyf.myspring;
  */
 public class Test {
     public static void main(String[] args) {
-        MyAnnotationConfigApplicationContext myAnnotationConfigApplicationContext = new MyAnnotationConfigApplicationContext("org.zyf.spring");
+        MyAnnotationConfigApplicationContext myAnnotationConfigApplicationContext = new MyAnnotationConfigApplicationContext("org.zyf.myspring");
 
     }
 }
