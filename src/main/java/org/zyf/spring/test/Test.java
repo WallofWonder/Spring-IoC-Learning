@@ -1,7 +1,7 @@
 package org.zyf.spring.test;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+//import org.springframework.context.ApplicationContext;
+//import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author ZYF
@@ -9,13 +9,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class Test {
     public static void main(String[] args) {
-        // 加载IoC容器
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.zyf.spring.entity");
-        String[] beans = applicationContext.getBeanDefinitionNames();
-        System.out.println(applicationContext.getBeanDefinitionCount());
-        for (String beanName : beans) {
-            System.out.println(beanName);
-            System.out.println(applicationContext.getBean(beanName));
-        }
+//        // 加载IoC容器
+//        ApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.zyf.spring.entity");
+//        String[] beans = applicationContext.getBeanDefinitionNames();
+//        System.out.println(applicationContext.getBeanDefinitionCount());
+//        for (String beanName : beans) {
+//            System.out.println(beanName);
+//            System.out.println(applicationContext.getBean(beanName));
+//        }
     }
 }
