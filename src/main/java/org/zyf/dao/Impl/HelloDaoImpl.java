@@ -1,6 +1,6 @@
-package org.zyf.service.dao.Impl;
+package org.zyf.dao.Impl;
 
-import org.zyf.service.dao.HelloDao;
+import org.zyf.dao.HelloDao;
 
 import java.util.Arrays;
 import java.util.List;

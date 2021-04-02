@@ -1,8 +1,8 @@
 package org.zyf.service.impl;
 
+import org.zyf.factory.BeanFactory;
 import org.zyf.service.HelloService;
-import org.zyf.service.dao.HelloDao;
-import org.zyf.service.dao.Impl.HelloDaoImpl;
+import org.zyf.dao.HelloDao;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HelloServiceImpl implements HelloService {
 
-    private HelloDao helloDao = new HelloDaoImpl();
+    private HelloDao helloDao = (HelloDao) BeanFactory.getDao();
 
     @Override
     public List<String> findAll() {

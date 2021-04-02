@@ -1,4 +1,4 @@
-package org.zyf.service.dao;
+package org.zyf.dao;
 
 import java.util.List;
 
