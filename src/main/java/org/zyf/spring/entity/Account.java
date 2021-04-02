@@ -1,6 +1,8 @@
 package org.zyf.spring.entity;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,4 +19,8 @@ public class Account {
     private String name;
     @Value("18")
     private Integer age;
+
+    @Autowired
+    @Qualifier("myOrder")
+    private Order order;
 }
