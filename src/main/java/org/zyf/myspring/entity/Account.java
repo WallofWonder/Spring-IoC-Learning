@@ -13,7 +13,7 @@ import org.zyf.myspring.Value;
 public class Account {
     @Value("1")
     private Integer id;
-    @Value("张三")
+    @Value("WonderWall")
     private String name;
     @Value("22")
     private Integer age;

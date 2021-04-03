@@ -1,8 +1,11 @@
 package org.zyf.myspring;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -10,15 +13,70 @@ import java.util.Set;
  * @create 2021-4-2 22:45
  */
 public class MyAnnotationConfigApplicationContext {
-    public MyAnnotationConfigApplicationContext(String pack) {
-        // 遍历包找到目标类（原材料）
-        Set<BeanDefinition> beanDefinitions = findBeanDefinitions(pack);
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            System.out.println(beanDefinition);
-        }
 
+    private Map<String, Object> ioc = new HashMap<>();
+
+    public MyAnnotationConfigApplicationContext(String pack) {
+        // 1、遍历包找到目标类（原材料）
+        Set<BeanDefinition> beanDefinitions = findBeanDefinitions(pack);
+        // 2、根据BeanDefinition创建bean
+        createObject(beanDefinitions);
     }
 
+
+    public Object getBean(String beanName) {
+        return ioc.get(beanName);
+    }
+
+    /**
+     * 根据BeanDefinition创建bean
+     *
+     * @param beanDefinitions BeanDefinition集合
+     */
+    public void createObject(Set<BeanDefinition> beanDefinitions) {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Class clazz = beanDefinition.getBeanClass();
+            String beanName = beanDefinition.getBeanName();
+            try {
+                Object object = clazz.getConstructor().newInstance();
+                // 对带@Value注解的属性赋值
+                for (Field declaredField : clazz.getDeclaredFields()) {
+                    Value valueAnnotation = declaredField.getAnnotation(Value.class);
+                    if (valueAnnotation != null) {
+                        String value = valueAnnotation.value();
+                        String fieldName = declaredField.getName();
+                        String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                        Method method = clazz.getMethod(methodName,declaredField.getType());
+                        // 得到的value是String类型的，需要将其转换成属性对应的类型
+                        Object val = null;
+                        switch (declaredField.getType().getName()) {
+                            case "java.lang.Integer":
+                                val = Integer.parseInt(value);
+                                break;
+                            case "java.lang.String":
+                                val = value;
+                                break;
+                            case "java.lang.Float":
+                                val = Float.parseFloat(value);
+                                break;
+                        }
+                        method.invoke(object, val);
+                    }
+                }
+                // 存入IoC容器
+                ioc.put(beanName, object);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 遍历包找到带注解的类
+     *
+     * @param pack 包名
+     * @return 带注解的类集合
+     */
     public Set<BeanDefinition> findBeanDefinitions(String pack) {
         // 1、获取包下的所有类
         Set<Class<?>> classes = MyTools.getClasses(pack);
@@ -33,7 +91,7 @@ public class MyAnnotationConfigApplicationContext {
                 if ("".equals(beanName)) {
                     // 获取首字母小写的类名
                     String className = clazz.getName().replaceAll(clazz.getPackage().getName() + ".", "");
-                    beanName = className.substring(0,1).toLowerCase() + className.substring(1);
+                    beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
                 }
                 // 3、将这些类封装成BeanDefinition，放入集合
                 beanDefinitions.add(new BeanDefinition(beanName, clazz));
