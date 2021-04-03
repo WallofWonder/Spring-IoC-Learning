@@ -21,8 +21,47 @@ public class MyAnnotationConfigApplicationContext {
         Set<BeanDefinition> beanDefinitions = findBeanDefinitions(pack);
         // 2、根据BeanDefinition创建bean
         createObject(beanDefinitions);
+        // 3、自动装载
+        autowiredObject(beanDefinitions);
     }
 
+    /**
+     * 根据BeanDefinition自动装载
+     *
+     * @param beanDefinitions BeanDefinition集合
+     */
+    public void autowiredObject(Set<BeanDefinition> beanDefinitions) {
+        for (BeanDefinition beanDefinition :
+                beanDefinitions) {
+            Class clazz = beanDefinition.getBeanClass();
+            for (Field declaredField : clazz.getDeclaredFields()) {
+                if (declaredField.getAnnotation(Autowired.class) != null) {
+                    Qualifier qualifier = declaredField.getAnnotation(Qualifier.class);
+                    if (qualifier!=null) {
+                        // byName
+                        try {
+                            String beaName = qualifier.value();
+                            // 从IoC容器中找到对应类
+                            Object bean = getBean(beaName);
+                            String fieldName = declaredField.getName();
+                            String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                            // 获取setter方法
+                            Method method = clazz.getMethod(methodName, declaredField.getType());
+                            // 获取装配的目标类
+                            Object object = getBean(beanDefinition.getBeanName());
+                            // 将bean装配到目标类
+                            method.invoke(object, bean);
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else  {
+                        // todo byType
+                    }
+                }
+            }
+        }
+    }
 
     public Object getBean(String beanName) {
         return ioc.get(beanName);
@@ -46,18 +85,30 @@ public class MyAnnotationConfigApplicationContext {
                         String value = valueAnnotation.value();
                         String fieldName = declaredField.getName();
                         String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-                        Method method = clazz.getMethod(methodName,declaredField.getType());
+                        Method method = clazz.getMethod(methodName, declaredField.getType());
                         // 得到的value是String类型的，需要将其转换成属性对应的类型
                         Object val = null;
                         switch (declaredField.getType().getName()) {
                             case "java.lang.Integer":
                                 val = Integer.parseInt(value);
                                 break;
+                            case "java.lang.Long":
+                                val = Long.parseLong(value);
+                                break;
+                            case "java.lang.Short":
+                                val = Short.parseShort(value);
+                                break;
                             case "java.lang.String":
                                 val = value;
                                 break;
                             case "java.lang.Float":
                                 val = Float.parseFloat(value);
+                                break;
+                            case "java.lang.Double":
+                                val = Double.parseDouble(value);
+                                break;
+                            case "java.lang.Character":
+                                val = value.toCharArray()[0];
                                 break;
                         }
                         method.invoke(object, val);

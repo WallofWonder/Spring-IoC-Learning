@@ -7,6 +7,6 @@ package org.zyf.myspring;
 public class Test {
     public static void main(String[] args) {
         MyAnnotationConfigApplicationContext applicationContext = new MyAnnotationConfigApplicationContext("org.zyf.myspring");
-        System.out.println(applicationContext.getBean("myOrder"));
+        System.out.println(applicationContext.getBean("account"));
     }
 }
