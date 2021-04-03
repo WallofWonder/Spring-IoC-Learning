@@ -3,10 +3,7 @@ package org.zyf.myspring;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author ZYF
@@ -37,7 +34,7 @@ public class MyAnnotationConfigApplicationContext {
             for (Field declaredField : clazz.getDeclaredFields()) {
                 if (declaredField.getAnnotation(Autowired.class) != null) {
                     Qualifier qualifier = declaredField.getAnnotation(Qualifier.class);
-                    if (qualifier!=null) {
+                    if (qualifier != null) {
                         // byName
                         try {
                             String beaName = qualifier.value();
@@ -55,8 +52,24 @@ public class MyAnnotationConfigApplicationContext {
                             e.printStackTrace();
                         }
                     }
-                    else  {
-                        // todo byType
+                    else {
+                        // byType
+                        try {
+                            String fieldName = declaredField.getType().getName();
+                            String packageName = declaredField.getType().getPackage().getName();
+                            String beanName = fieldName.replaceAll(packageName + ".", "").toLowerCase();
+                            String methodName = "set" + beanName.substring(0, 1).toUpperCase() + beanName.substring(1);
+                            // 获取setter方法
+                            Method method = clazz.getMethod(methodName, declaredField.getType());
+                            // 从IoC容器中找到对应类
+                            Object bean = getBean(beanName);
+                            // 获取装配的目标类
+                            Object object = getBean(beanDefinition.getBeanName());
+                            // 将bean装配到目标类
+                            method.invoke(object, bean);
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

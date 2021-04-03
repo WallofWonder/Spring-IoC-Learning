@@ -22,4 +22,6 @@ public class Account {
     @Autowired
     @Qualifier("myOrder")
     private Order order;
+    @Autowired
+    private Article article;
 }
